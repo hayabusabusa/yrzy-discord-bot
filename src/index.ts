@@ -9,16 +9,19 @@ const client = new Client({
 
 client.once("ready", () => {
   console.log("Ready");
+  console.log(client.user?.toString() ?? "null");
 });
 
-client.on("message", (message) => {
+client.on("messageCreate", async (message) => {
   // BOT からのメッセージは無視する.
   if (message.author.bot) {
     return;
   }
 
-  if (message.content === "テスト") {
-    message.channel.send("こんにちは");
+  const isMentioned = message.mentions.has(client.user?.id ?? "");
+  
+  if (isMentioned) {
+    await message.channel.send(`${message.author.toString()} メッセージを送信しましたー`);
   }
 });
 
