@@ -128,7 +128,22 @@ client.on("interactionCreate", async (interaction) => {
           return;
         }
 
-        await interaction.editReply( `${game} のサーバーを起動するよー`);
+        try {
+          const _ = await execPromise(`gcloud --account ${process.env.GCP_SERVICE_ACCOUNT_ID} compute instances start ${game + process.env.GCP_SERVER_INSTANCE_NAME_SUFFIX} --project ${process.env.GCP_PROJECT_NAME} --zone ${process.env.GCP_SERVER_INSTANCE_ZONE}`);
+        } catch (error) {
+          await interaction.editReply({
+            content: `サーバー起動時にエラーが発生したみたい...`,
+            embeds: [
+              {
+                color: 0xf44336,
+                description: `${error}`
+              }
+            ]
+          });
+          return;
+        }
+        
+        await interaction.editReply(`${game} のサーバーを起動したよー`);
 
         break;
       default:
