@@ -109,8 +109,7 @@ client.on("interactionCreate", async (interaction) => {
 
     if (game == null) {
       await interaction.reply({
-        content: "ゲーム名を教えてねー",
-        ephemeral: true,
+        content: "ゲーム名を教えてねー"
       });
       return;
     }
