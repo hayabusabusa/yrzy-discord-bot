@@ -86,8 +86,6 @@ const execPromise = async (command: string) => {
     exec(command, (error, stdout, stderr) => {
       if (error != null) reject(error);
 
-      if (stderr.length !== 0) reject(stderr);
-
       resolve(stdout);
     })
   })
