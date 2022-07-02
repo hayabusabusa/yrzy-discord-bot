@@ -91,6 +91,13 @@ const execPromise = async (command: string) => {
   })
 }
 
+const isRunning = async (game: string) => {
+  const stdout = await execPromise("gcloud compute instances list");
+  // インスタンスの状態をログから取り出し
+  const splited = stdout.split(/\r\n|\n/)
+  return splited.find((value) => value.includes(game))?.includes("RUNNING") ?? true;
+}
+
 // `/` コマンドが実行された時の動作
 client.on("interactionCreate", async (interaction) => {
   // コマンド以外は無視する
@@ -115,13 +122,9 @@ client.on("interactionCreate", async (interaction) => {
 
     switch (interaction.options.getSubcommand()) {
       case "start":
-        // サーバーの開始 一旦エラーは無視
-        const stdout = await execPromise("gcloud compute instances list");
-        // インスタンスの状態をログから取り出し
-        const splited = stdout.split(/\r\n|\n/)
-        const isServerRunning = splited.find((value) => value.includes(game))?.includes("RUNNING") ?? true;
+        const isServerRunningForStart = await isRunning(game);
 
-        if (isServerRunning) {
+        if (isServerRunningForStart) {
           await interaction.editReply("すでにサーバーは起動されているっぽいよ？？");
           return;
         }
@@ -142,6 +145,32 @@ client.on("interactionCreate", async (interaction) => {
         }
         
         await interaction.editReply(`${game} のサーバーを起動したよー`);
+
+        break;
+      case "stop":
+        const isServerRunningForStop = await isRunning(game);
+
+        if (!isServerRunningForStop) {
+          await interaction.editReply("すでにサーバーは停止されているっぽいよ？？");
+          return;
+        }
+
+        try {
+          const _ = await execPromise(`gcloud --account ${process.env.GCP_SERVICE_ACCOUNT_ID} compute instances stop ${game + process.env.GCP_SERVER_INSTANCE_NAME_SUFFIX} --zone ${process.env.GCP_SERVER_INSTANCE_ZONE}`);
+        } catch (error) {
+          await interaction.editReply({
+            content: `サーバー起動時にエラーが発生したみたい...`,
+            embeds: [
+              {
+                color: 0xf44336,
+                description: `${error}`
+              }
+            ]
+          });
+          return;
+        }
+
+        await interaction.editReply(`${game} のサーバーを停止したよー`);
 
         break;
       default:
