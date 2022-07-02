@@ -109,15 +109,13 @@ client.on("interactionCreate", async (interaction) => {
 
     if (game == null) {
       await interaction.reply({
-        content: "ゲーム名を教えてねー"
+        content: "ゲーム名を教えてねー",
       });
       return;
     }
 
     // インスタンスの立ち上げには時間がかかるので `defer` 指定にしておく
-    await interaction.deferReply({
-      ephemeral: true,
-    });
+    await interaction.deferReply();
 
     switch (interaction.options.getSubcommand()) {
       case "start":
