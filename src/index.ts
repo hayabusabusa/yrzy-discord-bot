@@ -129,7 +129,7 @@ client.on("interactionCreate", async (interaction) => {
         }
 
         try {
-          const _ = await execPromise(`gcloud --account ${process.env.GCP_SERVICE_ACCOUNT_ID} compute instances start ${game + process.env.GCP_SERVER_INSTANCE_NAME_SUFFIX} --project ${process.env.GCP_PROJECT_NAME} --zone ${process.env.GCP_SERVER_INSTANCE_ZONE}`);
+          const _ = await execPromise(`gcloud --account ${process.env.GCP_SERVICE_ACCOUNT_ID} compute instances start ${game + process.env.GCP_SERVER_INSTANCE_NAME_SUFFIX} --zone ${process.env.GCP_SERVER_INSTANCE_ZONE}`);
         } catch (error) {
           await interaction.editReply({
             content: `サーバー起動時にエラーが発生したみたい...`,
