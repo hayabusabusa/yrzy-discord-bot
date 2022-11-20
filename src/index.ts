@@ -10,8 +10,6 @@ const client = new Client({
 
 // BOT 起動時の動作
 client.once("ready", async () => {
-  console.log("Ready");
-
   // コマンドの登録
   await client.application?.commands.set([
     {
