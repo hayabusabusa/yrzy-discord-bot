@@ -191,19 +191,17 @@ export class ServerCommand implements Command {
    */
   private async messageIfNeeded(interaction: CommandInteraction<CacheType>, game: string) {
     // 開始時かつ ARK だけ手動でサーバーの停止を行う必要があるのでメッセージを残す.
-    if (interaction.options.getSubcommand() === "start" && game !== "ark") {
-      return;
+    if (interaction.options.getSubcommand() === "start" && game === "ark") {
+      await interaction.channel?.send({
+        content: `${interaction.user} ARK は手動でサーバーを落として保存してあげてね！`,
+        embeds: [
+          {
+            color: 0xffc107,
+            title: "☝️ ARK サーバーの落としかた",
+            description: "以下の手順でサーバーを落とさないと正常に保存が行われないから注意してね💦\n\n1. TAB キーを押してコンソールを開いてね。\n2. `enablecheats admin` をコンソールで実行してね。\n3. 最後に `admincheats doexit` を実行して完了！"
+          }
+        ]
+      });
     }
-
-    await interaction.channel?.send({
-      content: `${interaction.user} ARK は手動でサーバーを落として保存してあげてね！`,
-      embeds: [
-        {
-          color: 0xffc107,
-          title: "ARK サーバーの落としかた",
-          description: "以下の手順でサーバーを落とさないと正常に保存が行われないから注意してね💦\n\n1. TAB キーを押してコンソールを開いてね。\n2. `enablecheats admin` をコンソールで実行してね。\n3. 最後に `admincheats doexit` を実行して完了！"
-        }
-      ]
-    });
   }
 }
