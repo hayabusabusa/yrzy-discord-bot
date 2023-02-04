@@ -49,10 +49,6 @@ export class ServerCommand implements Command {
                 {
                   name: "Minecraft",
                   value: "minecraft"
-                },
-                {
-                  name: "ARK",
-                  value: "ark"
                 }
               ]
             }
@@ -76,10 +72,6 @@ export class ServerCommand implements Command {
                 {
                   name: "Minecraft",
                   value: "minecraft"
-                },
-                {
-                  name: "ARK",
-                  value: "ark"
                 }
               ]
             }
@@ -115,9 +107,6 @@ export class ServerCommand implements Command {
         await interaction.editReply("コマンドに間違いがあるかも💦");
         break;
     }
-
-    // 追加でメッセージを送る必要があれば送る( 補足情報など ).
-    await this.messageIfNeeded(interaction, game);
   }
 
   /**
@@ -182,26 +171,5 @@ export class ServerCommand implements Command {
     }
 
     await interaction.editReply(`${game} のサーバーを停止したよー`);
-  }
-
-  /**
-   * 追加でメッセージを送信する.
-   * @param interaction 実行されたコマンドの情報.
-   * @param game 対象になっているゲームのタイトル.
-   */
-  private async messageIfNeeded(interaction: CommandInteraction<CacheType>, game: string) {
-    // 開始時かつ ARK だけ手動でサーバーの停止を行う必要があるのでメッセージを残す.
-    if (interaction.options.getSubcommand() === "start" && game === "ark") {
-      await interaction.channel?.send({
-        content: `${interaction.user} ARK は手動でサーバーを落として保存してあげてね！`,
-        embeds: [
-          {
-            color: 0xffc107,
-            title: "☝️ ARK サーバーの落としかた",
-            description: "以下の手順でサーバーを落とさないと正常に保存が行われないから注意してね💦\n\n1. TAB キーを押してコンソールを開いてね。\n2. `enablecheats admin` をコンソールで実行してね。\n3. 最後に `admincheats doexit` を実行して完了！"
-          }
-        ]
-      });
-    }
   }
 }
