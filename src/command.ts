@@ -49,6 +49,10 @@ export class ServerCommand implements Command {
                 {
                   name: "Minecraft",
                   value: "minecraft"
+                },
+                {
+                  name: "PALWORLD",
+                  value: "palworld"
                 }
               ]
             }
@@ -72,6 +76,10 @@ export class ServerCommand implements Command {
                 {
                   name: "Minecraft",
                   value: "minecraft"
+                },
+                {
+                  name: "PALWORLD",
+                  value: "palworld"
                 }
               ]
             }
