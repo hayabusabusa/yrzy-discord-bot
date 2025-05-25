@@ -43,12 +43,8 @@ export class ServerCommand implements Command {
               required: true,
               choices: [
                 {
-                  name: "Terraria",
-                  value: "terraria"
-                },
-                {
                   name: "Minecraft",
-                  value: "minecraft"
+                  value: "minecraft-new"
                 },
                 {
                   name: "PALWORLD",
