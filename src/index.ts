@@ -1,4 +1,3 @@
-import { exec } from "child_process";
 import { Client } from "discord.js";
 import dotenv from "dotenv";
 
@@ -7,11 +6,11 @@ import { Command, ServerCommand } from "./command";
 dotenv.config();
 
 const client = new Client({
-  intents: ["GUILDS", "GUILD_MESSAGES"],
+  intents: ["GUILDS", "GUILD_MESSAGES"]
 });
 
 const commands = new Map<string, Command>([
-  ["server", new ServerCommand()],
+  ["server", new ServerCommand()]
 ]);
 
 // BOT 起動時の動作
@@ -19,7 +18,7 @@ client.once("ready", async () => {
   // 登録するコマンドの準備
   const resolvedCommands = Array.from(commands.values())
     .map((element) => { return element.resolved() });
-    
+
   // コマンドの登録
   await client.application?.commands.set(resolvedCommands, process.env.SERVER_ID ?? "");
 });
@@ -44,7 +43,7 @@ client.on("interactionCreate", async (interaction) => {
 //   if (message.author.bot) return;
 
 //   const isMentioned = message.mentions.has(client.user?.id ?? "");
-  
+
 //   if (isMentioned) {
 //     await message.channel.send(`${message.author.toString()} メッセージを送信しましたー`);
 //   }

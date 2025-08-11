@@ -12,7 +12,7 @@ export interface Command {
 
   /**
    * コマンドの処理を実行する.
-   * 
+   *
    * @param interaction 実行されたコマンドの情報.
    */
   execute(interaction: CommandInteraction<CacheType>): Promise<void>
@@ -20,14 +20,14 @@ export interface Command {
 
 /**
  * `/server` コマンドの定義.
- * 
+ *
  * 任意のゲームサーバーの起動、停止を行う.
- * 
+ *
  * 例) `/server start terraria`
  */
 export class ServerCommand implements Command {
-  resolved(): ApplicationCommandData {
-    return{
+  resolved (): ApplicationCommandData {
+    return {
       name: "server",
       description: "Start or stop game server",
       options: [
@@ -76,19 +76,19 @@ export class ServerCommand implements Command {
               ]
             }
           ]
-        },
+        }
       ]
     };
   }
 
-  async execute(interaction: CommandInteraction<CacheType>): Promise<void> {
+  async execute (interaction: CommandInteraction<CacheType>): Promise<void> {
     // コマンドのオプションからゲームのタイトルを取り出し
     const game = interaction.options.getString("game");
 
     // ゲームのタイトルが指定されていない場合はメッセージを返して終了する.
     if (game == null) {
       await interaction.reply({
-        content: "ゲーム名を教えてねー",
+        content: "ゲーム名を教えてねー"
       });
       return;
     }
@@ -114,7 +114,7 @@ export class ServerCommand implements Command {
    * @param interaction 実行されたコマンドの情報.
    * @param game 実行するゲームのタイトル.
    */
-  private async executeStartCommand(interaction: CommandInteraction, game: string) {
+  private async executeStartCommand (interaction: CommandInteraction, game: string) {
     // すでにサーバーが起動されている場合はメッセージを返して終了する.
     const isServerRunning = await isRunning(game);
     if (isServerRunning) {
@@ -124,7 +124,7 @@ export class ServerCommand implements Command {
 
     // サーバーの起動コマンドを実行.
     try {
-      const _ = await execPromise(`gcloud --account ${process.env.GCP_SERVICE_ACCOUNT_ID} compute instances start ${game + process.env.GCP_SERVER_INSTANCE_NAME_SUFFIX} --zone ${process.env.GCP_SERVER_INSTANCE_ZONE}`);
+      await execPromise(`gcloud --account ${process.env.GCP_SERVICE_ACCOUNT_ID} compute instances start ${game + process.env.GCP_SERVER_INSTANCE_NAME_SUFFIX} --zone ${process.env.GCP_SERVER_INSTANCE_ZONE}`);
     } catch (error) {
       await interaction.editReply({
         content: `サーバー起動時にエラーが発生したみたい...`,
@@ -137,7 +137,7 @@ export class ServerCommand implements Command {
       });
       return;
     }
-    
+
     await interaction.editReply(`${game} のサーバーを起動したよー`);
   }
 
@@ -146,7 +146,7 @@ export class ServerCommand implements Command {
    * @param interaction 実行されたコマンドの情報.
    * @param game 停止するゲームのタイトル.
    */
-  private async executeStopCommand(interaction: CommandInteraction, game: string) {
+  private async executeStopCommand (interaction: CommandInteraction, game: string) {
     // すでにサーバーが停止されている場合はメッセージを返して終了する.
     const isServerStopped = await isRunning(game);
     if (!isServerStopped) {
@@ -156,7 +156,7 @@ export class ServerCommand implements Command {
 
     // サーバーの停止コマンドを実行する.
     try {
-      const _ = await execPromise(`gcloud --account ${process.env.GCP_SERVICE_ACCOUNT_ID} compute instances stop ${game + process.env.GCP_SERVER_INSTANCE_NAME_SUFFIX} --zone ${process.env.GCP_SERVER_INSTANCE_ZONE}`);
+      await execPromise(`gcloud --account ${process.env.GCP_SERVICE_ACCOUNT_ID} compute instances stop ${game + process.env.GCP_SERVER_INSTANCE_NAME_SUFFIX} --zone ${process.env.GCP_SERVER_INSTANCE_ZONE}`);
     } catch (error) {
       await interaction.editReply({
         content: `サーバー起動時にエラーが発生したみたい...`,
