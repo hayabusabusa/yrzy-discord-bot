@@ -82,6 +82,15 @@ export class ServerCommand implements Command {
   }
 
   async execute (interaction: CommandInteraction<CacheType>): Promise<void> {
+    // `game` チャンネル以外はコマンドを実行できないようにする.
+    if (interaction.channel?.id !== "937343080019943494") {
+      await interaction.reply({
+        content: "このコマンドは #game チャンネルで実行してねー",
+        ephemeral: true
+      });
+      return;
+    }
+
     // コマンドのオプションからゲームのタイトルを取り出し
     const game = interaction.options.getString("game");
 
