@@ -47,8 +47,8 @@ export class ServerCommand implements Command {
                   value: "minecraft-new"
                 },
                 {
-                  name: "ARK: Survival Ascended",
-                  value: "ark"
+                  name: "PALWORLD",
+                  value: "palworld"
                 }
               ]
             }
@@ -70,8 +70,8 @@ export class ServerCommand implements Command {
                   value: "minecraft-new"
                 },
                 {
-                  name: "ARK: Survival Ascended",
-                  value: "ark"
+                  name: "PALWORLD",
+                  value: "palworld"
                 }
               ]
             }
