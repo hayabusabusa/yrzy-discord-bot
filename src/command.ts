@@ -1,5 +1,5 @@
 import { ApplicationCommandData, CommandInteraction, CacheType } from "discord.js";
-import { execPromise, isRunning } from "./util";
+import { execPromise, findGcpInstance, listGcpInstances, type GcpInstance } from "./util";
 
 /**
  * Discord で実行できるコマンドのインターフェース.
@@ -105,15 +105,28 @@ export class ServerCommand implements Command {
     // インスタンスの立ち上げには時間がかかるので `defer` 指定にしておく
     await interaction.deferReply();
 
-    switch (interaction.options.getSubcommand()) {
+    const subCommand = interaction.options.getSubcommand()
+
+    if (subCommand !== "start" && subCommand !== "stop") {
+      await interaction.editReply("コマンドに間違いがあるかも💦");
+      return;
+    }
+
+    const instanceName = `${game}${process.env.GCP_SERVER_INSTANCE_NAME_SUFFIX ?? ""}`
+    const instances = await listGcpInstances()
+    const instance = findGcpInstance(instances, instanceName)
+
+    if (instance == null) {
+      await interaction.editReply("対象のサーバーインスタンスが見つからなかったよ...");
+      return;
+    }
+
+    switch (subCommand) {
       case "start":
-        await this.executeStartCommand(interaction, game);
+        await this.executeStartCommand(interaction, game, instanceName, instance);
         break;
       case "stop":
-        await this.executeStopCommand(interaction, game);
-        break;
-      default:
-        await interaction.editReply("コマンドに間違いがあるかも💦");
+        await this.executeStopCommand(interaction, game, instanceName, instance);
         break;
     }
   }
@@ -122,18 +135,19 @@ export class ServerCommand implements Command {
    * サーバーの開始コマンドを実行する.
    * @param interaction 実行されたコマンドの情報.
    * @param game 実行するゲームのタイトル.
+   * @param instanceName 実行する GCP インスタンス名.
+   * @param instance 実行する GCP インスタンス情報.
    */
-  private async executeStartCommand (interaction: CommandInteraction, game: string) {
+  private async executeStartCommand (interaction: CommandInteraction, game: string, instanceName: string, instance: GcpInstance) {
     // すでにサーバーが起動されている場合はメッセージを返して終了する.
-    const isServerRunning = await isRunning(game);
-    if (isServerRunning) {
+    if (instance.status === "RUNNING") {
       await interaction.editReply("すでにサーバーは起動されているっぽいよ？？");
       return;
     }
 
     // サーバーの起動コマンドを実行.
     try {
-      await execPromise(`gcloud --account ${process.env.GCP_SERVICE_ACCOUNT_ID} compute instances start ${game + process.env.GCP_SERVER_INSTANCE_NAME_SUFFIX} --zone ${process.env.GCP_SERVER_INSTANCE_ZONE}`);
+      await execPromise(`gcloud --account ${process.env.GCP_SERVICE_ACCOUNT_ID} compute instances start ${instanceName} --zone ${instance.zone}`);
     } catch (error) {
       await interaction.editReply({
         content: `サーバー起動時にエラーが発生したみたい...`,
@@ -154,21 +168,22 @@ export class ServerCommand implements Command {
    * サーバーの停止コマンドを実行する.
    * @param interaction 実行されたコマンドの情報.
    * @param game 停止するゲームのタイトル.
+   * @param instanceName 実行する GCP インスタンス名.
+   * @param instance 実行する GCP インスタンス情報.
    */
-  private async executeStopCommand (interaction: CommandInteraction, game: string) {
+  private async executeStopCommand (interaction: CommandInteraction, game: string, instanceName: string, instance: GcpInstance) {
     // すでにサーバーが停止されている場合はメッセージを返して終了する.
-    const isServerStopped = await isRunning(game);
-    if (!isServerStopped) {
+    if (instance.status !== "RUNNING") {
       await interaction.editReply("すでにサーバーは停止されているっぽいよ？？");
       return;
     }
 
     // サーバーの停止コマンドを実行する.
     try {
-      await execPromise(`gcloud --account ${process.env.GCP_SERVICE_ACCOUNT_ID} compute instances stop ${game + process.env.GCP_SERVER_INSTANCE_NAME_SUFFIX} --zone ${process.env.GCP_SERVER_INSTANCE_ZONE}`);
+      await execPromise(`gcloud --account ${process.env.GCP_SERVICE_ACCOUNT_ID} compute instances stop ${instanceName} --zone ${instance.zone}`);
     } catch (error) {
       await interaction.editReply({
-        content: `サーバー起動時にエラーが発生したみたい...`,
+        content: `サーバー停止時にエラーが発生したみたい...`,
         embeds: [
           {
             color: 0xf44336,
